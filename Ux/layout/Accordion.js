@@ -93,9 +93,9 @@ Ext.define('Ux.layout.Accordion', {
     collapse: function(component) {
         if (component.isInnerItem() && !(this.getMode() === 'SINGLE' && this.getExpandedItem() === component)) {
             var titleDock   = component.titleDock,
-                titleHeight = titleDock.getEl().getHeight();
+                titleHeight = titleDock.element.getHeight();
 
-            component.fullHeight = component.getEl().getHeight();
+            component.fullHeight = component.element.getHeight();
             component.setHeight(titleHeight);
             component.collapsed = true;
             component.arrowButton.removeCls(this.itemArrowExpandedCls);

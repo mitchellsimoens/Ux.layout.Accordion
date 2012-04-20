@@ -18,9 +18,7 @@ Ext.define('Contact', {
 
     config : {
         fields : ['firstName', 'lastName']
-    },
-
-    fields : ['firstName', 'lastName']
+    }
 });
 
 Ext.setup({
@@ -65,9 +63,13 @@ Ext.setup({
                     layout : 'fit',
                     items  : [
                         {
-                            xtype   : 'list',
-                            itemTpl : '<div class="contact">{firstName} <strong>{lastName}</strong></div>',
-                            store   : Ext.create('Ext.data.Store', {
+                            xtype      : 'list',
+                            scrollable : {
+                                direction     : 'vertical',
+                                directionLock : true
+                            },
+                            itemTpl    : '<div class="contact">{firstName} <strong>{lastName}</strong></div>',
+                            store      : {
                                 model   : 'Contact',
                                 sorters : 'lastName',
 
@@ -75,10 +77,6 @@ Ext.setup({
                                     groupFn : function(record) {
                                         return record.get('lastName')[0];
                                     }
-                                },
-
-                                getGroupString: function(record) {
-                                    return record.get('lastName')[0];
                                 },
 
                                 data   : [
@@ -97,7 +95,7 @@ Ext.setup({
                                     { firstName : 'Nicolas',  lastName : 'Belmonte' },
                                     { firstName : 'Jason',    lastName : 'Johnston' }
                                 ]
-                            })
+                            }
                         }
                     ]
                 }
