@@ -52,7 +52,7 @@ Ext.define('Ux.layout.Accordion', {
             var titleDock = item.titleDock = item.insert(0, {
                     xtype  : 'titlebar',
                     docked : 'top',
-                    title  : item.title,
+                    title  : me.innerItems[index].config.title,
                     items  : [
                         {
                             cls     : me.itemArrowCls,
