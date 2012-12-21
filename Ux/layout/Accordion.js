@@ -43,7 +43,7 @@ Ext.define('Ux.layout.Accordion', {
         }
     },
 
-    insertItem: function(item, index) {
+    insertInnerItem: function(item, index) {
         var me = this;
 
         me.callParent([item, index]);
@@ -52,7 +52,7 @@ Ext.define('Ux.layout.Accordion', {
             var titleDock = item.titleDock = item.insert(0, {
                     xtype  : 'titlebar',
                     docked : 'top',
-                    title  : item.title,
+                    title  : me.container.items.items[index].config.title,
                     items  : [
                         {
                             cls     : me.itemArrowCls,
