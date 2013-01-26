@@ -43,7 +43,7 @@ Ext.define('Ux.layout.Accordion', {
         }
     },
 
-    insertItem: function(item, index) {
+    insertInnerItem: function(item, index) {
         var me = this;
 
         me.callParent([item, index]);
@@ -52,7 +52,7 @@ Ext.define('Ux.layout.Accordion', {
             var titleDock = item.titleDock = item.insert(0, {
                     xtype  : 'titlebar',
                     docked : 'top',
-                    title  : item.title,
+                    title  : me.container.items.items[index].config.title,
                     items  : [
                         {
                             cls     : me.itemArrowCls,
@@ -99,6 +99,7 @@ Ext.define('Ux.layout.Accordion', {
             component.setHeight(titleHeight);
             component.collapsed = true;
             component.arrowButton.removeCls(this.itemArrowExpandedCls);
+            component.innerItems[0].element.removeCls('x-unsized');
         }
     },
 
@@ -114,6 +115,7 @@ Ext.define('Ux.layout.Accordion', {
             component.setHeight(component.fullHeight);
             component.collapsed = false;
             component.arrowButton.addCls(this.itemArrowExpandedCls);
+            component.innerItems[0].element.addCls('x-unsized');
         }
     }
 });
