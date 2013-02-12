@@ -13,3 +13,5 @@
 .x-accordion-arrow-expanded {
     -webkit-transform : rotate(90deg);
 }
+
+.x-layout-accordion-item { overflow: hidden; }
