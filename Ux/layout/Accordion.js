@@ -99,7 +99,9 @@ Ext.define('Ux.layout.Accordion', {
             component.setHeight(titleHeight);
             component.collapsed = true;
             component.arrowButton.removeCls(this.itemArrowExpandedCls);
-            component.innerItems[0].element.removeCls('x-unsized');
+            if (component.innerItems[0]) {
+                component.innerItems[0].element.removeCls('x-unsized');
+            }
         }
     },
 
@@ -115,7 +117,9 @@ Ext.define('Ux.layout.Accordion', {
             component.setHeight(component.fullHeight);
             component.collapsed = false;
             component.arrowButton.addCls(this.itemArrowExpandedCls);
-            component.innerItems[0].element.addCls('x-unsized');
+            if (component.innerItems[0]) {
+                component.innerItems[0].element.addCls('x-unsized');
+            }
         }
     }
 });
