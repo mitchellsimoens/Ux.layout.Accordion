@@ -12,8 +12,9 @@ Ext.define('Ux.layout.Accordion', {
     itemArrowExpandedCls : Ext.baseCSSPrefix + 'accordion-arrow-expanded',
 
     config : {
-        expandedItem : null,
-        mode         : 'SINGLE'
+        expandedItem     : null,
+        mode             : 'SINGLE',
+        toggleOnTitlebar : false
     },
 
     constructor: function(container) {
@@ -61,7 +62,17 @@ Ext.define('Ux.layout.Accordion', {
                             scope   : me,
                             handler : 'handleToggleButton'
                         }
-                    ]
+                    ],
+                    listeners: {
+                      tap: {
+                        fn: function(event, el) {
+                          if (me.getToggleOnTitlebar()) {
+                            me.toggleCollapse(titleDock.up('component'));
+                          }
+                        },
+                        element: 'element'
+                      }
+                    }
                 }),
                 arrowBtn  = item.arrowButton = titleDock.down('button[cls=' + me.itemArrowCls + ']');
 
