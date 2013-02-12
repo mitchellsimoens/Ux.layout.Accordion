@@ -12,8 +12,9 @@ Ext.define('Ux.layout.Accordion', {
     itemArrowExpandedCls : Ext.baseCSSPrefix + 'accordion-arrow-expanded',
 
     config : {
-        expandedItem : null,
-        mode         : 'SINGLE'
+        expandedItem     : null,
+        mode             : 'SINGLE',
+        toggleOnTitlebar : false
     },
 
     constructor: function(container) {
@@ -61,7 +62,17 @@ Ext.define('Ux.layout.Accordion', {
                             scope   : me,
                             handler : 'handleToggleButton'
                         }
-                    ]
+                    ],
+                    listeners: {
+                      tap: {
+                        fn: function(event, el) {
+                          if (me.getToggleOnTitlebar()) {
+                            me.toggleCollapse(titleDock.up('component'));
+                          }
+                        },
+                        element: 'element'
+                      }
+                    }
                 }),
                 arrowBtn  = item.arrowButton = titleDock.down('button[cls=' + me.itemArrowCls + ']');
 
@@ -99,7 +110,9 @@ Ext.define('Ux.layout.Accordion', {
             component.setHeight(titleHeight);
             component.collapsed = true;
             component.arrowButton.removeCls(this.itemArrowExpandedCls);
-            component.innerItems[0].element.removeCls('x-unsized');
+            if (component.innerItems[0]) {
+                component.innerItems[0].element.removeCls('x-unsized');
+            }
         }
     },
 
@@ -115,7 +128,9 @@ Ext.define('Ux.layout.Accordion', {
             component.setHeight(component.fullHeight);
             component.collapsed = false;
             component.arrowButton.addCls(this.itemArrowExpandedCls);
-            component.innerItems[0].element.addCls('x-unsized');
+            if (component.innerItems[0]) {
+                component.innerItems[0].element.addCls('x-unsized');
+            }
         }
     }
 });
