@@ -17,7 +17,7 @@ Ext.define('Ux.layout.Accordion', {
         toggleOnTitlebar : false
     },
 
-    constructor: function(container) {
+    setContainer: function(container) {
         this.callParent(arguments);
 
         if (this.getMode() === 'SINGLE') {
@@ -102,6 +102,9 @@ Ext.define('Ux.layout.Accordion', {
     },
 
     collapse: function(component) {
+        if(!component.isComponent) {
+            component = Ext.getCmp(component.getId());
+        }
         if (component.isInnerItem() && !(this.getMode() === 'SINGLE' && this.getExpandedItem() === component)) {
             var titleDock   = component.titleDock,
                 titleHeight = titleDock.element.getHeight();
