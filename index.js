@@ -27,12 +27,15 @@ Ext.setup({
             fullscreen : true,
             layout     : {
                 type : 'accordion',
-                mode : 'MULTI'
+                toggleOnTitlebar : false,
+                mode : 'SINGLE'
             },
             scrollable : 'vertical',
             items      : [
                 {
                     title : 'Form',
+                    collapsed: false,
+                    layout: 'fit',
                     items : [
                         {
                             xtype : 'textfield',
@@ -59,8 +62,9 @@ Ext.setup({
                 },
                 {
                     title  : 'List',
-                    height : 400,
+                    height : 600,
                     layout : 'fit',
+                    collapsed: true,
                     items  : [
                         {
                             xtype      : 'list',
