@@ -27,14 +27,14 @@ Ext.setup({
             fullscreen : true,
             layout     : {
                 type : 'accordion',
-                toggleOnTitlebar : false,
+                toggleOnTitlebar : true,
                 mode : 'SINGLE'
             },
             scrollable : 'vertical',
             items      : [
                 {
                     title : 'Form',
-                    collapsed: false,
+                    collapsed: true,
                     layout: 'fit',
                     items : [
                         {
@@ -57,6 +57,135 @@ Ext.setup({
                                     ui   : 'confirm'
                                 }
                             ]
+                        }
+                    ]
+                },
+                {
+                    title  : 'List',
+                    height : 600,
+                    layout : 'fit',
+                    collapsed: true,
+                    items  : [
+                        {
+                            xtype      : 'list',
+                            scrollable : {
+                                direction     : 'vertical',
+                                directionLock : true
+                            },
+                            itemTpl    : '<div class="contact">{firstName} <strong>{lastName}</strong></div>',
+                            store      : {
+                                model   : 'Contact',
+                                sorters : 'lastName',
+
+                                grouper : {
+                                    groupFn : function(record) {
+                                        return record.get('lastName')[0];
+                                    }
+                                },
+
+                                data   : [
+                                    { firstName : 'Mitchell', lastName : 'Simoens'  },
+                                    { firstName : 'Rob',      lastName : 'Dougan'   },
+                                    { firstName : 'Ed',       lastName : 'Spencer'  },
+                                    { firstName : 'Jamie',    lastName : 'Avins'    },
+                                    { firstName : 'Aaron',    lastName : 'Conran'   },
+                                    { firstName : 'Dave',     lastName : 'Kaneda'   },
+                                    { firstName : 'Jacky',    lastName : 'Nguyen'   },
+                                    { firstName : 'Abraham',  lastName : 'Elias'    },
+                                    { firstName : 'Jay',      lastName : 'Robinson' },
+                                    { firstName : 'Nigel',    lastName : 'White'    },
+                                    { firstName : 'Don',      lastName : 'Griffin'  },
+                                    { firstName : 'Nico',     lastName : 'Ferrero'  },
+                                    { firstName : 'Nicolas',  lastName : 'Belmonte' },
+                                    { firstName : 'Jason',    lastName : 'Johnston' }
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    title  : 'List',
+                    height : 600,
+                    layout : 'fit',
+                    collapsed: true,
+                    items  : [
+                        {
+                            xtype      : 'list',
+                            scrollable : {
+                                direction     : 'vertical',
+                                directionLock : true
+                            },
+                            itemTpl    : '<div class="contact">{firstName} <strong>{lastName}</strong></div>',
+                            store      : {
+                                model   : 'Contact',
+                                sorters : 'lastName',
+
+                                grouper : {
+                                    groupFn : function(record) {
+                                        return record.get('lastName')[0];
+                                    }
+                                },
+
+                                data   : [
+                                    { firstName : 'Mitchell', lastName : 'Simoens'  },
+                                    { firstName : 'Rob',      lastName : 'Dougan'   },
+                                    { firstName : 'Ed',       lastName : 'Spencer'  },
+                                    { firstName : 'Jamie',    lastName : 'Avins'    },
+                                    { firstName : 'Aaron',    lastName : 'Conran'   },
+                                    { firstName : 'Dave',     lastName : 'Kaneda'   },
+                                    { firstName : 'Jacky',    lastName : 'Nguyen'   },
+                                    { firstName : 'Abraham',  lastName : 'Elias'    },
+                                    { firstName : 'Jay',      lastName : 'Robinson' },
+                                    { firstName : 'Nigel',    lastName : 'White'    },
+                                    { firstName : 'Don',      lastName : 'Griffin'  },
+                                    { firstName : 'Nico',     lastName : 'Ferrero'  },
+                                    { firstName : 'Nicolas',  lastName : 'Belmonte' },
+                                    { firstName : 'Jason',    lastName : 'Johnston' }
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    title  : 'List',
+                    height : 600,
+                    layout : 'fit',
+                    collapsed: true,
+                    items  : [
+                        {
+                            xtype      : 'list',
+                            scrollable : {
+                                direction     : 'vertical',
+                                directionLock : true
+                            },
+                            itemTpl    : '<div class="contact">{firstName} <strong>{lastName}</strong></div>',
+                            store      : {
+                                model   : 'Contact',
+                                sorters : 'lastName',
+
+                                grouper : {
+                                    groupFn : function(record) {
+                                        return record.get('lastName')[0];
+                                    }
+                                },
+
+                                data   : [
+                                    { firstName : 'Mitchell', lastName : 'Simoens'  },
+                                    { firstName : 'Rob',      lastName : 'Dougan'   },
+                                    { firstName : 'Ed',       lastName : 'Spencer'  },
+                                    { firstName : 'Jamie',    lastName : 'Avins'    },
+                                    { firstName : 'Aaron',    lastName : 'Conran'   },
+                                    { firstName : 'Dave',     lastName : 'Kaneda'   },
+                                    { firstName : 'Jacky',    lastName : 'Nguyen'   },
+                                    { firstName : 'Abraham',  lastName : 'Elias'    },
+                                    { firstName : 'Jay',      lastName : 'Robinson' },
+                                    { firstName : 'Nigel',    lastName : 'White'    },
+                                    { firstName : 'Don',      lastName : 'Griffin'  },
+                                    { firstName : 'Nico',     lastName : 'Ferrero'  },
+                                    { firstName : 'Nicolas',  lastName : 'Belmonte' },
+                                    { firstName : 'Jason',    lastName : 'Johnston' }
+                                ]
+                            }
                         }
                     ]
                 },
