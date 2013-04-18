@@ -1,5 +1,6 @@
 .x-layout-accordion-item.x-layout-accordion-item-anim {
     -webkit-transition : height 300ms ease-in;
+    -webkit-transform: translateZ(0);
 }
 
 .x-accordion-arrow {
@@ -14,4 +15,7 @@
     -webkit-transform : rotate(90deg);
 }
 
-.x-layout-accordion-item { overflow: hidden; }
+.x-layout-accordion-item {
+    overflow: hidden;
+    -webkit-transform: translateZ(0);
+}

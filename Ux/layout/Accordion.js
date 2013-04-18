@@ -14,7 +14,8 @@ Ext.define('Ux.layout.Accordion', {
     config : {
         expandedItem     : null,
         mode             : 'SINGLE',
-        toggleOnTitlebar : false
+        toggleOnTitlebar : false,
+        header           : null
     },
 
     setContainer: function (container) {
@@ -25,16 +26,39 @@ Ext.define('Ux.layout.Accordion', {
         }
 
         // Fixed a problem when the first item has 0 height initially causing a "bounce"
-        container.on('show', 'fixItemHeight', this, { single : true});
+        container.on('show', 'finalStage', this, { single : true});
     },
 
     // @private
-    fixItemHeight: function (container) {
+    finalStage: function (container) {
         var items = container.getInnerItems();
 
+        // Fix item height
         if (items.length > 0) {
             items[0].setHeight(items[0].element.getHeight());
         }
+
+        Ext.defer(this.postProcess, 1000, this, [container]);
+    },
+
+    // @private
+    postProcess: function (container) {
+        var me = this,
+            items = container.getInnerItems();
+
+        items.forEach(function (item) {
+            // Tricky: defer the animation so that animation does not apply to initial
+            // layout which has caused slow down in screen refresh initially when the
+            // number of inner items is more than 3
+            item.addCls(me.itemAnimCls);
+
+            // Limit the height of the inner item to the height of the container to avoid
+            // problems of losing the header when on a phone
+            if (item.fullHeight > container.element.getHeight()) {
+                item.innerElement.setHeight(container.element.getHeight());
+                item.fullHeight = container.element.getHeight();
+            }
+        });
     },
 
     // @private
@@ -62,7 +86,8 @@ Ext.define('Ux.layout.Accordion', {
     insertInnerItem: function (item, index) {
         var me = this,
             titleDock,
-            arrowBtn;
+            arrowBtn,
+            header;
 
         me.callParent([item, index]);
 
@@ -70,39 +95,41 @@ Ext.define('Ux.layout.Accordion', {
             return;
         }
 
-        titleDock = item.titleDock = item.insert(0, {
-            xtype  : 'titlebar',
-            docked : 'top',
-            title  : me.container.items.items[index].config.title,
-            items  : [
-                {
-                    cls     : me.itemArrowCls,
-                    ui      : 'plain',
-                    align   : 'right',
-                    scope   : me,
-                    handler : 'handleToggleButton'
+        if (this.config.header) {
+            header = this.config.header;
+        } else {
+            header = {
+                xtype  : 'titlebar',
+                docked : 'top',
+                title  : me.container.items.items[index].config.title,
+                items  : [
+                    {
+                        cls     : me.itemArrowCls,
+                        ui      : 'plain',
+                        align   : 'right',
+                        scope   : me,
+                        handler : 'handleToggleButton'
+                    }
+                ],
+                listeners: {
+                    tap: {
+                        fn: function () {
+                            if (me.getToggleOnTitlebar()) {
+                                me.toggleCollapse(titleDock.up('component'));
+                            }
+                        },
+                        element: 'element'
+                    }
                 }
-            ],
-            listeners: {
-                tap: {
-                    fn: function () {
-                        if (me.getToggleOnTitlebar()) {
-                            me.toggleCollapse(titleDock.up('component'));
-                        }
-                    },
-                    element: 'element'
-                }
-            }
-        });
+            };
+        }
+
+        titleDock = item.titleDock = item.insert(0, header);
 
         arrowBtn  = item.arrowButton = titleDock.down('button[cls=' + me.itemArrowCls + ']');
 
         item.addCls(me.itemCls);
         arrowBtn.addCls(me.itemArrowExpandedCls);
-
-        item.on('painted', function () {
-            item.addCls(me.itemAnimCls);
-        }, me, { single : true });
 
         // Set the collapsed attribute from config, false by default if not set
         item.collapsed = me.container.items.items[index].config.collapsed;
@@ -153,9 +180,11 @@ Ext.define('Ux.layout.Accordion', {
 
     expand: function (component) {
         if (component.isInnerItem()) {
-            if (this.getMode() === 'SINGLE') {
-                var expanded = this.getExpandedItem();
+            var me = this,
+                container = component.up(),
+                expanded = this.getExpandedItem();
 
+            if (this.getMode() === 'SINGLE') {
                 this.setExpandedItem(component);
                 if (expanded) {
                     this.collapse(expanded);
@@ -168,6 +197,41 @@ Ext.define('Ux.layout.Accordion', {
             if (component.innerItems[0]) {
                 component.innerItems[0].element.addCls('x-unsized');
             }
+
+            Ext.defer(function () {
+                if (container.element.getHeight() < component.element.getY() + component.fullHeight) {
+
+                    // Temporary remove animation of expanding item if scrolling is required as the two
+                    // animations will compete and cause awkward transitions
+                    component.removeCls(me.itemAnimCls);
+                    container.on('scrollend', me.restoreAnimation, component, {single: true});
+
+                    // Scroll to end if last item.
+                    if (container.items.items[container.items.length - 1].getId() === component.getId()) {
+                        if (component.fullHeight > container.element.getHeight()) {
+                            Ext.defer(me.delayScroll, 150, this, [container, Math.min(component.element.getY())]);
+                        } else {
+                            Ext.defer(me.delayScroll, 150, this, [container, -1]);
+                        }
+                    } else {
+                        Ext.defer(me.delayScroll, 150, this, [container, Math.min(component.element.getY(), component.innerElement.getHeight())]);
+                    }
+                }
+            }, 150);
         }
+    },
+
+    // @private
+    delayScroll: function (container, y) {
+        if (y < 0) {
+            container.getScrollable().getScroller().scrollToEnd({duration: 300});
+        } else {
+            container.getScrollable().getScroller().scrollBy(0, y, {duration: 300});
+        }
+    },
+
+    // @private
+    restoreAnimation: function (component) {
+        component.addCls(this.itemAnimCls);
     }
 });
