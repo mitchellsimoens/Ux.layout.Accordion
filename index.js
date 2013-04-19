@@ -27,7 +27,7 @@ Ext.setup({
             fullscreen : true,
             layout     : {
                 type : 'accordion',
-                toggleOnTitlebar : true,
+                toggleOnTitlebar : false,
                 mode : 'SINGLE'
             },
             scrollable : 'vertical',
