@@ -44,7 +44,8 @@ Ext.define('Ux.layout.Accordion', {
     // @private
     postProcess: function (container) {
         var me = this,
-            items = container.getInnerItems();
+            items = container.getInnerItems(),
+            containerHeight = container.element.getHeight();
 
         items.forEach(function (item) {
             // Tricky: defer the animation so that animation does not apply to initial
@@ -54,9 +55,9 @@ Ext.define('Ux.layout.Accordion', {
 
             // Limit the height of the inner item to the height of the container to avoid
             // problems of losing the header when on a phone
-            if (item.fullHeight > container.element.getHeight()) {
-                item.innerElement.setHeight(container.element.getHeight());
-                item.fullHeight = container.element.getHeight();
+            if (item.fullHeight > containerHeight) {
+                item.innerElement.setHeight(containerHeight);
+                item.fullHeight = containerHeight;
             }
         });
     },
@@ -151,9 +152,11 @@ Ext.define('Ux.layout.Accordion', {
     },
 
     handleToggleButton: function (btn) {
-        var component = btn.up('titlebar').up('component');
+        if (!this.getToggleOnTitlebar()) {
+            var component = btn.up('titlebar').up('component');
 
-        this.toggleCollapse(component);
+            this.toggleCollapse(component);
+        }
     },
 
     toggleCollapse: function (component) {
@@ -182,7 +185,8 @@ Ext.define('Ux.layout.Accordion', {
         if (component.isInnerItem()) {
             var me = this,
                 container = component.up(),
-                expanded = this.getExpandedItem();
+                expanded = this.getExpandedItem(),
+                rmAnim = false;
 
             if (this.getMode() === 'SINGLE') {
                 this.setExpandedItem(component);
@@ -191,47 +195,41 @@ Ext.define('Ux.layout.Accordion', {
                 }
             }
 
+            // Temporary remove animation of expanding item if scrolling is required as the two
+            // animations will compete and cause awkward transitions
+            if (container.element.getHeight() < component.element.getY() + component.fullHeight) {
+                component.removeCls(me.itemAnimCls);
+                rmAnim = true;
+            }
+
             component.setHeight(component.fullHeight);
             component.collapsed = false;
+
+            if (rmAnim) {
+                component.addCls(me.itemAnimCls);
+            }
+
             component.arrowButton.addCls(this.itemArrowExpandedCls);
             if (component.innerItems[0]) {
                 component.innerItems[0].element.addCls('x-unsized');
             }
 
-            Ext.defer(function () {
-                if (container.element.getHeight() < component.element.getY() + component.fullHeight) {
-
-                    // Temporary remove animation of expanding item if scrolling is required as the two
-                    // animations will compete and cause awkward transitions
-                    component.removeCls(me.itemAnimCls);
-                    container.on('scrollend', me.restoreAnimation, component, {single: true});
-
-                    // Scroll to end if last item.
-                    if (container.items.items[container.items.length - 1].getId() === component.getId()) {
-                        if (component.fullHeight > container.element.getHeight()) {
-                            Ext.defer(me.delayScroll, 150, this, [container, Math.min(component.element.getY())]);
-                        } else {
-                            Ext.defer(me.delayScroll, 150, this, [container, -1]);
-                        }
-                    } else {
-                        Ext.defer(me.delayScroll, 150, this, [container, Math.min(component.element.getY(), component.innerElement.getHeight())]);
+            // There was collapsing so it needs to wait until the collapsing animation is done before calculating heights
+            // The delay must be > 300 (animation timing in CSS for collapsing)
+            if (me.getMode() === 'SINGLE') {
+                Ext.defer(function () {
+                    if (container.element.getHeight() < component.element.getY() + component.fullHeight) {
+                        container.getScrollable().getScroller().scrollBy(0, component.element.getY() + component.fullHeight - container.element.getHeight(), {duration: 300});
                     }
+                }, 310);
+            } else {
+                if (container.element.getHeight() < component.element.getY() + component.fullHeight) {
+                    // The scroller in the multiple mode requires some delay or it does not scroll due to animation
+                    Ext.defer(function () {
+                        container.getScrollable().getScroller().scrollBy(0, component.element.getY() + component.fullHeight - container.element.getHeight(), {duration: 300});
+                    }, 380);
                 }
-            }, 150);
+            }
         }
-    },
-
-    // @private
-    delayScroll: function (container, y) {
-        if (y < 0) {
-            container.getScrollable().getScroller().scrollToEnd({duration: 300});
-        } else {
-            container.getScrollable().getScroller().scrollBy(0, y, {duration: 300});
-        }
-    },
-
-    // @private
-    restoreAnimation: function (component) {
-        component.addCls(this.itemAnimCls);
     }
 });
