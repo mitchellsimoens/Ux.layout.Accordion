@@ -15,6 +15,7 @@ Ext.define('Ux.layout.Accordion', {
         expandedItem     : null,
         mode             : 'SINGLE',
         toggleOnTitlebar : false,
+        defaultCollapsed : false,
         header           : null
     },
 
@@ -64,23 +65,11 @@ Ext.define('Ux.layout.Accordion', {
 
     // @private
     checkMode: function (container) {
-        var me = this,
-            items = container.getInnerItems(),
-            lastItem = null;
-
-        items.forEach(function (item) {
-            if (!item.collapsed) {
-                if (lastItem) {
-                    me.collapse(lastItem);
-                }
-
-                lastItem = item;
-            }
-        });
+        var items = container.getInnerItems();
 
         // Make sure at least one item is expanded
-        if (items.length > 0 && !lastItem) {
-            me.expand(items[0]);
+        if (items.length > 0 && !this.getExpandedItem()) {
+            this.expand(items[0]);
         }
     },
 
@@ -88,7 +77,8 @@ Ext.define('Ux.layout.Accordion', {
         var me = this,
             titleDock,
             arrowBtn,
-            header;
+            header,
+            expandedItem;
 
         me.callParent([item, index]);
 
@@ -136,17 +126,24 @@ Ext.define('Ux.layout.Accordion', {
         item.collapsed = me.container.items.items[index].config.collapsed;
 
         if (item.collapsed === undefined) {
-            item.collapsed = false;
+            item.collapsed = this.getDefaultCollapsed();
         }
 
         if (item.collapsed) {
             item.on('painted', 'collapse', me, { single : true });
         } else if (me.getMode() === 'SINGLE') {
-            if (!me.getExpandedItem()) {
-                me.setExpandedItem(item);
-            } else {
-                // Collapse the rest of panes
-                item.on('painted', 'collapse', me, { single : true });
+            expandedItem = me.getExpandedItem();
+            me.setExpandedItem(item);
+            if (expandedItem) {
+                // In case the newly added item is done dynamically,
+                // the expanded item would have been painted so we can
+                // call the collapse method directly since the elements
+                // would have sized correctly.
+                if (expandedItem.isPainted()) {
+                    me.collapse(expandedItem);
+                } else {
+                    expandedItem.on('painted', 'collapse', me, { single : true });
+                }
             }
         }
     },
